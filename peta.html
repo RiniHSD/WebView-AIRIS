@@ -47,6 +47,24 @@
       });
       var basemap4 = L.tileLayer('https://geoservices.big.go.id/rbi/rest/services/BASEMAP/Rupabumi_Indonesia/MapServer/tile/{z}/{y}/{x}', {
       });
+      var basemap5 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {});
+      var basemap6 = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+        attribution: '&copy; Stamen & OpenStreetMap',
+        maxZoom: 18
+      });
+      var basemap7 = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+        attribution: '&copy; Stamen & OpenStreetMap',
+        maxZoom: 20
+      });
+      var basemap8 = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB & OpenStreetMap',
+        maxZoom: 19
+      });
+      var basemap9 = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB & OpenStreetMap',
+        maxZoom: 19
+      });
+
 
       basemap.addTo(map);
       
@@ -55,7 +73,10 @@
         "OpenStreetMap": basemap1,
         "Esri World Street": basemap2,
         "Esri Imagery": basemap3,
-        "Rupa Bumi Indonesia": basemap4
+        "Rupa Bumi Indonesia": basemap4,
+        "Esri Topographic": basemap5,
+        "Carto Positron": basemap8,
+        "Carto Dark": basemap9
       };
 
       L.control.layers(baseMaps).addTo(map);
