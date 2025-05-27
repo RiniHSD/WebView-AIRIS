@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Halaman Peta PRESISI</title>
+    <title>Halaman Peta AIRIS</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -58,14 +58,7 @@
         "Rupa Bumi Indonesia": basemap4
       };
 
-      var imageUrl = 'petajogjakiri.jpg';
-      var imageBounds = [[-7.75, 110.25],[-7.875, 110.375]]; // titik ikat koordinat kiri atas dan kanan bawah citra
-      var rbiLayer = L.imageOverlay(imageUrl, imageBounds); //tidak langsung ditambahkan ke dalam peta, melainkan harus dipanggil dulu lewat layer kontrol
-      var overlayMaps = {
-        "Peta RBI Offline": rbiLayer
-      };
-
-      L.control.layers(baseMaps, overlayMaps).addTo(map);
+      L.control.layers(baseMaps).addTo(map);
 
       // Geolocation API to move the map to user's location
       if (navigator.geolocation) {
