@@ -1,0 +1,44 @@
+html, body, #map {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+  }
+  
+  .custom-control {
+    padding: 6px 8px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+  }
+  
+  .custom-control button {
+    font-size: 14px;
+    padding: 4px 8px;
+    background: #0078A8;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  .custom-control button:hover {
+    background: #005580;
+  }
+  
+  #fileInput {
+    display: block;
+    margin: 8px;
+  }
+  
+  .validation-info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    max-width: 300px;
+  }
+  
