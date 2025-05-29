@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Halaman Peta AIRIS</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="" />
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="./leaflet-measure/leaflet-measure.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+    <script>
+      // yogyakarta
+      var map = L.map('map').setView([-0.8332348, 114.8031435], 1);
+
+      // basemap
+      var basemap = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+          maxZoom: 18,
+        },
+      ).addTo(map);
+
+      /* Tile Basemap */
+      var basemap1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      });
+      var basemap2 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+        });
+      var basemap3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      });
+      var basemap4 = L.tileLayer('https://geoservices.big.go.id/rbi/rest/services/BASEMAP/Rupabumi_Indonesia/MapServer/tile/{z}/{y}/{x}', {
+      });
+      var basemap5 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {});
+      var basemap6 = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+        attribution: '&copy; Stamen & OpenStreetMap',
+        maxZoom: 18
+      });
+      var basemap7 = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+        attribution: '&copy; Stamen & OpenStreetMap',
+        maxZoom: 20
+      });
+      var basemap8 = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB & OpenStreetMap',
+        maxZoom: 19
+      });
+      var basemap9 = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB & OpenStreetMap',
+        maxZoom: 19
+      });
+
+      basemap.addTo(map);
+      
+      /* Control Layer */
+      var baseMaps = {
+        "OpenStreetMap": basemap1,
+        "Esri World Street": basemap2,
+        "Esri Imagery": basemap3,
+        "Rupa Bumi Indonesia": basemap4,
+        "Esri Topographic": basemap5,
+        "Carto Positron": basemap8,
+        "Carto Dark": basemap9
+      };
+
+      L.control.layers(baseMaps).addTo(map);
+
+      // Geolocation API to move the map to user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            var userLat = position.coords.latitude;
+            var userLng = position.coords.longitude;
+
+            map.flyTo([userLat, userLng], 18, {
+              duration: 5,
+              easeLinearity: 0.25
+            });
+
+            // Add marker at user's location
+            L.marker([userLat, userLng]).addTo(map).bindPopup("Anda berada disini").openPopup();
+          },
+          function (error) {
+            console.log("Error getting location: " + error.message);
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        console.log("Geolocation is not supported by this browser.");
+      }
+    </script>
+  </body>
+</html>
