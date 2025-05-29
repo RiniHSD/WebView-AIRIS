@@ -166,16 +166,50 @@
         try {
           const res = await fetch('https://backend-airis-app.vercel.app/auth/bangunan');
           const buildingsData = await res.json();
+
           buildingLayer.clearLayers();
+
           L.geoJSON(buildingsData, {
             pointToLayer: function(feature, latlng) {
+  
+              const jenis = feature.properties.jenis;
+
+              switch (jenis) {
+                case 'Bangunan Intake':
+                  iconSymbol = '💧'; break;
+                case 'Bangunan Penguras':
+                  iconSymbol = '🚰'; break;
+                case 'Mercu Bendung':
+                  iconSymbol = '🧱'; break;
+                case 'Bangunan Bagi':
+                  iconSymbol = '🔀'; break;
+                case 'Bangunan Sadap':
+                  iconSymbol = '🚪'; break;
+                default:
+                  iconSymbol = '📍';
+              }
+
               const marker = L.marker(latlng, {
                 icon: L.divIcon({
                   className: 'building-icon',
-                  html: '🏗️',
-                  iconSize: [24, 24]
+                  html: iconSymbol,
+                  iconSize: [50, 50]
                 })
-              }).bindPopup(`<b>${feature.properties.name}</b><br>ID: ${feature.properties.id}`);
+              }).bindPopup(`<b>${feature.properties.name}</b>
+                  <br>Jenis: ${feature.properties.jenis}
+                  <br>Tanggal Update: ${feature.properties.tanggal}
+                  <br>Fungsi: ${feature.properties.fungsi}
+                  <br>Bahan: ${feature.properties.bahan}
+                  <br>Lokasi: ${feature.properties.lokasi}
+                  <br>Kondisi: ${feature.properties.kondisi}
+                  <br>Luas Petak Tersier: ${feature.properties.luasoncoran}
+                  <br>Jenis Kebutuhan: ${feature.properties.jeniskebutuhan}
+                  <br>Luas Sawah: ${feature.properties.luassawah}
+                  <br>Luas Kolam: ${feature.properties.luaskolam}
+                  <br>Luas Perkebunan: ${feature.properties.luaskebun}
+                  <br>
+                  ${feature.properties.foto ? `<img src="https://backend-airis-app.vercel.app/auth/bangunan/${feature.properties.foto}" style="width:100px; margin-top:5px;">` : ''}
+                  `);
               marker.feature = feature;
               return marker;
             }
