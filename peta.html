@@ -171,6 +171,18 @@
 
           L.geoJSON(buildingsData, {
             pointToLayer: function(feature, latlng) {
+
+              const rawDate = feature.properties.tanggal;
+              const formattedDate = rawDate ? new Date(rawDate).toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+              }) : '-';
+
+              const fotoUrl = feature.properties.foto;
+              const fotoImg = fotoUrl
+                ? `<img src="${fotoUrl}" style="width:100%;max-width:250px;border-radius:6px;margin-top:8px;" />`
+                : '<i>Tidak ada foto</i>';
   
               const jenis = feature.properties.jenis;
 
@@ -197,7 +209,7 @@
                 })
               }).bindPopup(`<b>${feature.properties.name}</b>
                   <br>Jenis: ${feature.properties.jenis}
-                  <br>Tanggal Update: ${feature.properties.tanggal}
+                  <br>Tanggal Update: ${formattedDate}
                   <br>Fungsi: ${feature.properties.fungsi}
                   <br>Bahan: ${feature.properties.bahan}
                   <br>Lokasi: ${feature.properties.lokasi}
@@ -207,8 +219,7 @@
                   <br>Luas Sawah: ${feature.properties.luassawah}
                   <br>Luas Kolam: ${feature.properties.luaskolam}
                   <br>Luas Perkebunan: ${feature.properties.luaskebun}
-                  <br>
-                  ${feature.properties.foto ? `<img src="https://backend-airis-app.vercel.app/auth/bangunan/${feature.properties.foto}" style="width:100px; margin-top:5px;">` : ''}
+                  <br>Foto ${fotoImg}
                   `);
               marker.feature = feature;
               return marker;
