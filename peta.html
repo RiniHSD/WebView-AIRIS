@@ -109,6 +109,12 @@
         
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'custom-control');
+
+          // ⬇️ Tambahkan style flex arah kolom
+          container.style.display = 'flex';
+          container.style.flexDirection = 'column';
+          container.style.alignItems = 'flex-start';
+          container.style.gap = '6px'; // Jarak antar tombol
           
           // Tombol untuk upload GeoJSON
           var uploadBtn = L.DomUtil.create('button', '', container);
