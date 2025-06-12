@@ -11,6 +11,15 @@
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="" 
     />
+    
+    <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+    
+    <!-- Leaflet PolylineDecorator -->
+    <script src="https://unpkg.com/leaflet-polylinedecorator@1.7.0/dist/leaflet.polylineDecorator.min.js"></script>
+
   </head>
 
   <body>
@@ -79,18 +88,32 @@
         "Carto Positron": basemap8,
         "Carto Dark": basemap9
       };
-      
+
       // Layer untuk GeoJSON saluran irigasi
       var irrigationLayer = L.geoJSON(null, {
-        style: function(feature) {
-          return { color: '#0066ff', weight: 4 };
-        },
-        onEachFeature: function(feature, layer) {
-          if (feature.properties && feature.properties.name) {
-            layer.bindPopup(feature.properties.name);
-          }
-        }
-      }).addTo(map);
+      style: function(feature) {
+        const tingkat = feature.properties?.tingkat?.toLowerCase();
+
+        let warna = '#000000'; // default hitam jika tidak dikenali
+        let tebal = 2;
+
+        if (tingkat === 'primer') {warna = '#004da8'; tebal = 5;}
+        else if (tingkat === 'sekunder') {warna = '#ff0000'; tebal = 4;}
+        else if (tingkat === 'tersier') {warna = '#a900e6'; tebal = 3;}
+        else if (tingkat === 'karangtalun') {warna = '#004da8'; tebal = 6;}
+
+        return {
+          color: warna,
+          weight: tebal
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        const name = feature.properties?.Name || 'Tanpa nama';
+        const tingkat = feature.properties?.tingkat?.toLowerCase();
+        layer.bindPopup(`<b>${name}</b><br>Tingkat: ${tingkat}`);
+      }
+    }).addTo(map);
+
       
       // Layer untuk titik bangunan dari database
       var buildingLayer = L.layerGroup().addTo(map);
@@ -124,13 +147,13 @@
           };
           
           // Tombol untuk validasi titik
-          var validateBtn = L.DomUtil.create('button', '', container);
-          validateBtn.innerHTML = 'Validasi Titik';
-          validateBtn.style.marginTop = '5px';
-          validateBtn.onclick = function() {
-            var infoBox = document.getElementById('validationInfo');
-            infoBox.style.display = infoBox.style.display === 'none' ? 'block' : 'none';
-          };
+          // var validateBtn = L.DomUtil.create('button', '', container);
+          // validateBtn.innerHTML = 'Validasi Titik';
+          // validateBtn.style.marginTop = '5px';
+          // validateBtn.onclick = function() {
+          //   var infoBox = document.getElementById('validationInfo');
+          //   infoBox.style.display = infoBox.style.display === 'none' ? 'block' : 'none';
+          // };
           
           return container;
         }
@@ -195,6 +218,8 @@
               switch (jenis) {
                 case 'Bangunan Intake':
                   iconSymbol = '💧'; break;
+                case 'Bangunan Ukur':
+                  iconSymbol = '📏'; break;
                 case 'Bangunan Penguras':
                   iconSymbol = '🚰'; break;
                 case 'Mercu Bendung':
@@ -203,6 +228,8 @@
                   iconSymbol = '🔀'; break;
                 case 'Bangunan Sadap':
                   iconSymbol = '🚪'; break;
+                case 'Terjunan':
+                  iconSymbol = '🌊'; break;
                 default:
                   iconSymbol = '📍';
               }
@@ -211,7 +238,7 @@
                 icon: L.divIcon({
                   className: 'building-icon',
                   html: iconSymbol,
-                  iconSize: [50, 50]
+                  iconSize: [10, 10]
                 })
               }).bindPopup(`<b>${feature.properties.name}</b>
                   <br>Jenis: ${feature.properties.jenis}
@@ -236,6 +263,24 @@
         }
       }
       loadBuildingsFromDatabase();
+
+      // Memuat data saluran dari file lokal di assets/saluran.geojson
+      fetch('./assets/saluran.geojson')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Gagal memuat file saluran.geojson');
+          }
+          return response.json();
+        })
+        .then(data => {
+          irrigationLayer.clearLayers().addData(data);
+          if (irrigationLayer.getLayers().length > 0) {
+            map.fitBounds(irrigationLayer.getBounds());
+          }
+        })
+        .catch(err => {
+          console.error('Error loading saluran.geojson:', err.message);
+        });
       
       // Fungsi untuk validasi titik terhadap saluran
       function validatePointAgainstLine(point, line) {
@@ -333,13 +378,13 @@
             var userLat = position.coords.latitude;
             var userLng = position.coords.longitude;
 
-            map.flyTo([userLat, userLng], 18, {
-              duration: 5,
-              easeLinearity: 0.25
-            });
+            // map.flyTo([userLat, userLng], 18, {
+            //   duration: 5,
+            //   easeLinearity: 0.25
+            // });
 
             // Add marker at user's location
-            L.marker([userLat, userLng]).addTo(map).bindPopup("Anda berada disini").openPopup();
+            // L.marker([userLat, userLng]).addTo(map).bindPopup("Anda berada disini").openPopup();
           },
           function (error) {
             console.log("Error getting location: " + error.message);
