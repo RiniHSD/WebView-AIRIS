@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Halaman Peta AIRIS</title>
     <link rel="stylesheet" href="style.css" />
+    
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="" 
     />
-    
     <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -21,38 +21,31 @@
 	  <link rel="stylesheet" href="./leaflet-markercluster/dist/MarkerCluster.Default.css" />
 	  <script src="./leaflet-markercluster/dist/leaflet.markercluster-src.js"></script>
 
-  </head>
+    <script src="./leaflet-measure/leaflet-measure.js"></script>
+
+    </head>
 
   <body>
     <div id="map"></div>
     <input type="file" id="fileInput"/>
-    <div class="validation-info" id="validationInfo" style="display: none;">
-      <h3>Validasi Titik</h3>
-      <div id="validationResult"></div>
-    </div>
-
     <script>
-      // yogyakarta
+      // Inisialisasi peta
       var map = L.map('map').setView([-0.8332348, 114.8031435], 1);
 
-      // basemap
+      // Basemap
       var basemap = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
-          maxZoom: 19,
+          maxZoom: 18,
         },
       ).addTo(map);
 
-      /* Tile Basemap */
-      var basemap1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      });
-      var basemap2 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-        });
-      var basemap3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      });
-      var basemap4 = L.tileLayer('https://geoservices.big.go.id/rbi/rest/services/BASEMAP/Rupabumi_Indonesia/MapServer/tile/{z}/{y}/{x}', {
-      });
-      var basemap5 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {});
+      /* Tile Basemap (Tetap dipertahankan) */
+      var basemap1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {});
+      var basemap2 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {});
+      var basemap3 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {});
+      var basemap4 = L.tileLayer('https://geoservices.big.go.id/rbi/rest/services/BASEMAP/Rupabumi_Indonesia/MapServer/tile/{z}/{y}/{x}', {});
+      var basemap5 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{x}/{y}', {});
       var basemap6 = L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
         attribution: '&copy; Stamen & OpenStreetMap',
         maxZoom: 18
@@ -85,31 +78,31 @@
 
       // Layer untuk GeoJSON saluran irigasi
       var irrigationLayer = L.geoJSON(null, {
-      style: function(feature) {
-        const tingkat = feature.properties?.tingkat?.toLowerCase();
+        style: function(feature) {
+          const tingkat = feature.properties?.tingkat?.toLowerCase();
 
-        let warna = '#000000'; // default hitam jika tidak dikenali
-        let tebal = 2;
+          let warna = '#000000'; // default hitam jika tidak dikenali
+          let tebal = 2;
 
-        if (tingkat === 'primer') {warna = '#004da8'; tebal = 5;}
-        else if (tingkat === 'sekunder') {warna = '#ff0000'; tebal = 4;}
-        else if (tingkat === 'tersier') {warna = '#a900e6'; tebal = 3;}
-        else if (tingkat === 'karangtalun') {warna = '#004da8'; tebal = 6;}
+          if (tingkat === 'primer') {warna = '#004da8'; tebal = 5;}
+          else if (tingkat === 'sekunder') {warna = '#ff0000'; tebal = 4;}
+          else if (tingkat === 'tersier') {warna = '#a900e6'; tebal = 3;}
+          else if (tingkat === 'karangtalun') {warna = '#004da8'; tebal = 6;}
 
-        return {
-          color: warna,
-          weight: tebal
-        };
-      },
-      onEachFeature: function(feature, layer) {
-        const name = feature.properties?.Name || 'Tanpa nama';
-        const tingkat = feature.properties?.tingkat?.toLowerCase();
-        layer.bindPopup(`<b>${name}</b><br>Tingkat: ${tingkat}`);
-      }
-    }).addTo(map);
+          return {
+            color: warna,
+            weight: tebal
+          };
+        },
+        onEachFeature: function(feature, layer) {
+          const name = feature.properties?.Name || 'Tanpa nama';
+          const tingkat = feature.properties?.tingkat?.toLowerCase();
+          layer.bindPopup(`<b>${name}</b><br>Tingkat: ${tingkat}`);
+        }
+      }).addTo(map);
 
       
-      // Layer untuk titik bangunan dari database
+      // Layer untuk titik bangunan dari database dengan Marker Cluster
       var buildingLayer = L.markerClusterGroup().addTo(map);
       
       // Tambahkan kontrol layer
@@ -117,8 +110,38 @@
         "Saluran Irigasi": irrigationLayer,
         "Bangunan Irigasi": buildingLayer
       }).addTo(map);
+
+      // Tambahkan kontrol legenda
+      var legend = L.control({position: 'bottomleft'});
+
+      legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+
+        div.innerHTML += '<h3>Legenda</h3>';
+        div.innerHTML += '<h4>Saluran Irigasi</h4>';
+        div.innerHTML += '<div><i style="background:#004da8;width:30px;height:6px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Induk Karangtalun</div>';
+        div.innerHTML += '<div><i style="background:#004da8;width:30px;height:5px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Primer</div>';
+        div.innerHTML += '<div><i style="background:#ff0000;width:30px;height:4px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Sekunder</div>';
+        div.innerHTML += '<div><i style="background:#a900e6;width:30px;height:3px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Tersier</div>';
+
+        div.innerHTML += '<hr style="margin: 6px 0;">';
+        div.innerHTML += '<h4>Bangunan Irigasi</h4>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">💧</span>Bangunan Intake</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📏</span>Bangunan Ukur</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚰</span>Bangunan Penguras</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🧱</span>Mercu Bendung</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🔀</span>Bangunan Bagi</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚪</span>Bangunan Sadap</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🌊</span>Terjunan</div>';
+        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📍</span>Lainnya</div>';
+
+        return div;
+      };
+
+
+      legend.addTo(map);
       
-      // Tambahkan kontrol custom untuk upload GeoJSON
+      // Tambahkan kontrol custom untuk upload GeoJSON (Tombol "Tambah Saluran")
       var customControl = L.Control.extend({
         options: {
           position: 'topright'
@@ -127,7 +150,6 @@
         onAdd: function(map) {
           var container = L.DomUtil.create('div', 'custom-control');
 
-          // ⬇️ Tambahkan style flex arah kolom
           container.style.display = 'flex';
           container.style.flexDirection = 'column';
           container.style.alignItems = 'flex-start';
@@ -140,51 +162,43 @@
             document.getElementById('fileInput').click();
           };
           
-          // Tombol untuk validasi titik
-          // var validateBtn = L.DomUtil.create('button', '', container);
-          // validateBtn.innerHTML = 'Validasi Titik';
-          // validateBtn.style.marginTop = '5px';
-          // validateBtn.onclick = function() {
-          //   var infoBox = document.getElementById('validationInfo');
-          //   infoBox.style.display = infoBox.style.display === 'none' ? 'block' : 'none';
-          // };
+          // Tombol validasi titik DIHILANGKAN
           
           return container;
         }
       });
       
       map.addControl(new customControl());
-
-      //const geojsonLayer = L.geoJSON().addTo(map);
       
       // Event listener untuk upload GeoJSON
       document.getElementById('fileInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        try {
-          const geojson = JSON.parse(event.target.result);
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          try {
+            const geojson = JSON.parse(event.target.result);
 
-          irrigationLayer.clearLayers().addData(geojson);
+            irrigationLayer.clearLayers().addData(geojson);
 
-          if (irrigationLayer.getLayers().length > 0) {
-            map.fitBounds(irrigationLayer.getBounds());
+            if (irrigationLayer.getLayers().length > 0) {
+              map.fitBounds(irrigationLayer.getBounds());
+            }
+
+            window.ReactNativeWebView?.postMessage('uploaded'); // optional
+          } catch (err) {
+            console.error("Error details:", err); 
+            alert('File GeoJSON tidak valid: ' + err.message);
           }
+        };
+        reader.onerror = function() {
+          alert('Gagal membaca file');
+        };
+        reader.readAsText(file);
+      });
 
-          window.ReactNativeWebView?.postMessage('uploaded'); // optional
-        } catch (err) {
-          console.error("Error details:", err); 
-          alert('File GeoJSON tidak valid: ' + err.message);
-        }
-      };
-      reader.onerror = function() {
-        alert('Gagal membaca file');
-      };
-      reader.readAsText(file);
-    });
-
+      // Fungsi untuk memuat data bangunan dari database
       async function loadBuildingsFromDatabase() {
         try {
           const res = await fetch('https://backend-airis-app.vercel.app/auth/bangunan');
@@ -276,109 +290,19 @@
           console.error('Error loading saluran.geojson:', err.message);
         });
       
-      // Fungsi untuk validasi titik terhadap saluran
-      function validatePointAgainstLine(point, line) {
-        if (!line || line.getLayers().length === 0) {
-          return { distance: null, isValid: false, message: "Tidak ada data saluran" };
-        }
-        
-        // Ambil GeoJSON dari layer saluran
-        var lineGeoJSON = line.toGeoJSON();
-        
-        // Hitung jarak menggunakan Turf.js
-        var distance = turf.pointToLineDistance(point, lineGeoJSON, { units: 'meters' });
-        
-        // Toleransi 5 cm
-        var isValid = distance <= 0.05;
-        
-        return {
-          distance: distance,
-          isValid: isValid,
-          message: isValid ? 
-            "✅ Bangunan berada di atas saluran" : 
-            "❌ Bangunan tidak di atas saluran"
-        };
-      }
-      
-      // Event klik pada peta untuk validasi
-      map.on('click', function(e) {
-        const validationInfo = document.getElementById('validationInfo');
-        if (validationInfo.style.display === 'none') return;
-
-        // Buat titik GeoJSON dari lokasi klik
-        const point = turf.point([e.latlng.lng, e.latlng.lat]);
-
-        // Cek apakah ada saluran di irrigationLayer
-        const result = validatePointAgainstLine(point, irrigationLayer);
-
-        let resultHtml = `
-          <b>Koordinat:</b> ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}<br>
-          <b>Status:</b> ${result.message}<br>
-        `;
-
-        if (result.distance !== null) {
-          resultHtml += `<b>Jarak ke saluran:</b> ${result.distance.toFixed(3)} m`;
-        }
-
-        // Tampilkan hasil validasi
-        document.getElementById('validationResult').innerHTML = resultHtml;
-
-        try {
-          const marker = L.marker(e.latlng).addTo(map);
-          marker.bindPopup(resultHtml).openPopup();
-        } catch (err) {
-          console.error('Gagal menambahkan marker:', err.message);
-          alert('Gagal menampilkan titik validasi.');
-        }
-      });
-
-      
-      // Validasi semua bangunan terhadap saluran
-      function validateAllBuildings() {
-        var buildings = buildingLayer.getLayers();
-        var lineExists = irrigationLayer.getLayers().length > 0;
-
-        buildings.forEach(function(building) {
-          // ⛔ Cek apakah ini marker
-          if (typeof building.getLatLng !== 'function') {
-            console.warn('Lewatkan layer non-marker:', building);
-            return;
-          }
-
-          var latlng = building.getLatLng();
-          var point = turf.point([latlng.lng, latlng.lat]);
-
-          if (lineExists) {
-            var result = validatePointAgainstLine(point, irrigationLayer);
-            const name = building.feature?.properties?.name || 'Bangunan';
-            building.bindPopup(`<b>${name}</b><br>
-              ${result.message}<br>
-              Jarak: ${result.distance.toFixed(3)} m`);
-          } else {
-            building.bindPopup(`<b>Bangunan</b><br>
-              ❌ Tidak ada data saluran untuk validasi`);
-          }
-        });
-      }
-
-      
-      // Jalankan validasi saat data saluran diubah
-      irrigationLayer.on('layeradd layerremove', validateAllBuildings);
-
-      // Geolocation API to move the map to user's location
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           function (position) {
             var userLat = position.coords.latitude;
             var userLng = position.coords.longitude;
 
-            // map.flyTo([userLat, userLng], 18, {
-            //   duration: 5,
-            //   easeLinearity: 0.25
-            // });
+            map.flyTo([userLat, userLng], 18, {
+              duration: 5,
+              easeLinearity: 0.25
+            });
 
-            // Add marker at user's location
-            // L.marker([userLat, userLng]).addTo(map).bindPopup("Anda berada disini").openPopup();
+            //Add marker at user's location
+            L.marker([userLat, userLng]).addTo(map).bindPopup("Anda berada disini").openPopup();
           },
           function (error) {
             console.log("Error getting location: " + error.message);

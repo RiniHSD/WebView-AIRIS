@@ -43,7 +43,7 @@ html, body, #map {
   }
 
   .building-icon {
-    font-size: 20px; /* Ukuran font emoji */
+    font-size: 10px; /* Ukuran font emoji */
     text-align: center;
     line-height: 1;
     transform: translate(-50%, -50%); /* Pusatkan simbol */
@@ -64,5 +64,26 @@ html, body, #map {
   .marker-cluster div {
     font-size: 14px;
     font-weight: bold;
+  }
+
+  .info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8); /* Background transparan */
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+  }
+  .info h4 {
+    margin: 0 0 5px;
+    color: #777;
+  }
+  .legend i {
+    width: 18px; /* Lebar kotak warna */
+    height: 18px; /* Tinggi kotak warna */
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+    border-radius: 2px; /* Sedikit rounded corner */
   }
   
