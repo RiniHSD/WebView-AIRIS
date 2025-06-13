@@ -111,35 +111,81 @@
         "Bangunan Irigasi": buildingLayer
       }).addTo(map);
 
-      // Tambahkan kontrol legenda
-      var legend = L.control({position: 'bottomleft'});
+      // // Tambahkan kontrol legenda
+      // var legend = L.control({position: 'bottomleft'});
 
-      legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
+      // legend.onAdd = function (map) {
+      //   var div = L.DomUtil.create('div', 'info legend');
 
-        div.innerHTML += '<h3>Legenda</h3>';
-        div.innerHTML += '<h4>Saluran Irigasi</h4>';
-        div.innerHTML += '<div><i style="background:#004da8;width:30px;height:6px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Induk Karangtalun</div>';
-        div.innerHTML += '<div><i style="background:#004da8;width:30px;height:5px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Primer</div>';
-        div.innerHTML += '<div><i style="background:#ff0000;width:30px;height:4px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Sekunder</div>';
-        div.innerHTML += '<div><i style="background:#a900e6;width:30px;height:3px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Tersier</div>';
+      //   div.innerHTML += '<h3>Legenda</h3>';
+      //   div.innerHTML += '<h4>Saluran Irigasi</h4>';
+      //   div.innerHTML += '<div><i style="background:#004da8;width:30px;height:6px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Induk Karangtalun</div>';
+      //   div.innerHTML += '<div><i style="background:#004da8;width:30px;height:5px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Primer</div>';
+      //   div.innerHTML += '<div><i style="background:#ff0000;width:30px;height:4px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Sekunder</div>';
+      //   div.innerHTML += '<div><i style="background:#a900e6;width:30px;height:3px;display:inline-block;margin-right:18px;margin-bottom:3px;margin-top:4px;"></i> Saluran Tersier</div>';
 
-        div.innerHTML += '<hr style="margin: 6px 0;">';
-        div.innerHTML += '<h4>Bangunan Irigasi</h4>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">💧</span>Bangunan Intake</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📏</span>Bangunan Ukur</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚰</span>Bangunan Penguras</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🧱</span>Mercu Bendung</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🔀</span>Bangunan Bagi</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚪</span>Bangunan Sadap</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🌊</span>Terjunan</div>';
-        div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📍</span>Lainnya</div>';
+      //   div.innerHTML += '<hr style="margin: 6px 0;">';
+      //   div.innerHTML += '<h4>Bangunan Irigasi</h4>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">💧</span>Bangunan Intake</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📏</span>Bangunan Ukur</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚰</span>Bangunan Penguras</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🧱</span>Mercu Bendung</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🔀</span>Bangunan Bagi</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🚪</span>Bangunan Sadap</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">🌊</span>Terjunan</div>';
+      //   div.innerHTML += '<div><span style="font-size:16px;margin-right:18px;margin-bottom:3px;margin-top:4px;">📍</span>Lainnya</div>';
 
-        return div;
-      };
+      //   return div;
+      // };
 
+      // legend.addTo(map);
 
-      legend.addTo(map);
+      // custom legend
+      var legendControl = L.Control.extend({
+        options: { position: 'bottomleft' },
+
+        onAdd: function(map) {
+          var container = L.DomUtil.create('div', 'leaflet-control legend-collapsible');
+
+          // Tombol toggle
+          var button = L.DomUtil.create('button', 'legend-toggle', container);
+          button.innerHTML = '📘 Legenda';
+          button.style.marginBottom = '5px';
+
+          // Konten legenda
+          var content = L.DomUtil.create('div', 'legend-content', container);
+          content.style.display = 'none'; // default tertutup
+
+          // Isi legenda
+          content.innerHTML = `
+            <strong>Saluran Irigasi</strong><br>
+            <div><i style="background:#004da8;width:30px;height:6px;display:inline-block;margin-right:8px;"></i> Saluran Induk Karangtalun</div>
+            <div><i style="background:#004da8;width:30px;height:4px;display:inline-block;margin-right:8px;"></i> Saluran Primer</div>
+            <div><i style="background:#ff0000;width:30px;height:3px;display:inline-block;margin-right:8px;"></i> Saluran Sekunder</div>
+            <div><i style="background:#a900e6;width:30px;height:3px;display:inline-block;margin-right:8px;"></i> Saluran Tersier</div>
+            <hr>
+            <strong>Bangunan Irigasi</strong><br>
+            <div>💧 Bangunan Intake</div>
+            <div>📏 Bangunan Ukur</div>
+            <div>🚰 Bangunan Penguras</div>
+            <div>🧱 Mercu Bendung</div>
+            <div>🔀 Bangunan Bagi</div>
+            <div>🚪 Bangunan Sadap</div>
+            <div>🌊 Terjunan</div>
+            <div>📍 Lainnya</div>
+          `;
+
+          // Toggle behavior
+          button.onclick = function() {
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+          };
+
+          return container;
+        }
+      });
+
+      map.addControl(new legendControl());
+
       
       // Tambahkan kontrol custom untuk upload GeoJSON (Tombol "Tambah Saluran")
       var customControl = L.Control.extend({
