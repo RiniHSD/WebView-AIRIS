@@ -43,7 +43,7 @@ html, body, #map {
   }
 
   .building-icon {
-    font-size: 10px; /* Ukuran font emoji */
+    font-size: 15px; /* Ukuran font emoji */
     text-align: center;
     line-height: 1;
     transform: translate(-50%, -50%); /* Pusatkan simbol */
